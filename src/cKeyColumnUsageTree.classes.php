@@ -339,7 +339,50 @@ class cKeyColumnUsageTreeNodeData {
     public function __toString( ) : string
     {
         return $this->GetKey( );
-    }    
+        
+    }  // function __toString( )
+    
+    
+    /**
+      *
+      * Fills the array $ary with the table names referring to $this->m_table_name directly
+      *
+      * @param array $ary the array which should be filled with the referencing table names 
+      *
+      */       
+    
+    
+    public function CollectAllDirectlyReferencingTables( array & $ary ) {
+    
+            $ary = array( );
+    
+            foreach ( $this->m_a_referring_tables as $table_name ) {
+                $ary[] = $table_name;
+            }
+
+    
+    }   // function CollectAllDirectlyReferencingTables( )
+    
+    /**
+      *
+      * Fills the array $ary with the table names the table $this->m_table_name is directly referring to
+      *
+      * @param array $ary the array which should be filled with the referenced table names 
+      *
+      */       
+    
+    
+    public function CollectAllDirectlyReferencedTables( array & $ary ) {
+    
+            $ary = array( );
+    
+            foreach ( $this->m_a_referenced_tables as $table_name ) {
+                $ary[] = $table_name;
+            }
+
+    
+    }   // function CollectGetAllDirectlyReferencedTables( )
+    
 
 }  // class cKeyColumnUsageTreeNodeData
 
@@ -1275,6 +1318,155 @@ class cKeyColumnUsageTree extends \rstoetter\cbalancedbinarytree\cBalancedBinary
     
         
     }   // function CollectAllSelfReferencingTables( )    
+    
+    
+    /**
+      *
+      * Fills the array $a_collected with the table names directly or indirectly referring to the table object represented by $obj_referenced
+      *
+      * @param array $a_collected the array which should be filled with the names of the tables referencing $obj_referenced as strings
+      * @param \rstoetter\cbalancedbinarytree\cBalancedBinaryTreeNode |null $obj_actual the object we are examining now
+      * @param \rstoetter\cbalancedbinarytree\cBalancedBinaryTreeNode  $obj_referenced the table object the tables in $a_collected are referring to
+      *
+      */       
+    
+    
+    protected function _CollectAllReferencingTables( 
+                                        array & $a_collected, 
+                                        $obj_actual, 
+                                        \rstoetter\cbalancedbinarytree\cBalancedBinaryTreeNode  $obj_referenced 
+                                        ) {
+        if ( is_null( $obj_actual ) ) {
+            return;
+        }
+        
+        foreach( $obj_actual->GetData( )->m_a_referring_table_objects as $obj_referrer ) {
+        
+            $table_name = $obj_referrer->GetData( )->m_table_name;
+            if ( ! in_array( $table_name, $a_collected ) ) {
+                $a_collected[] = $table_name;
+            }
+            
+            if ( $table_name == $obj_actual->GetData( )->m_table_name ) {   // self-referencing table
+                continue;
+            }
+            
+            $this->_CollectAllReferencingTables( $a_collected, $obj_referrer, $obj_referenced );
+            
+        }
+                                        
+    
+    }   // function _CollectAllReferencingTables( )
+    
+    
+    /**
+      *
+      * Fills the array $ary with the table names referring to $this->m_table_name directly
+      *
+      * @param array $ary the array which should be filled with the names of the tables referencing directly or indirectly the table $table_name
+      * @param string $table_name the name of the table to examine
+      * @param bool $recursive defaults to true. If false, then merely tables directly referenced by $this->m_table_name are collected
+      *
+      */       
+    
+    
+    public function CollectAllReferencingTables( array & $ary, string $table_name, bool $recursive = true ) {
+    
+            $ary = array( );
+            
+            $obj_found = $this->SearchByKey( $table_name );
+            
+            if ( $obj_found !== false ) {
+            
+                if ( ! $recursive ) {
+                
+                    $obj_found->GetData( )->CollectAllDirectlyReferencingTables( $ary );
+                
+                } else {
+                
+                    $this->_CollectAllReferencingTables( $ary, $obj_found, $obj_found );
+                
+                }        
+
+        
+
+            }
+            
+    }   // function CollectAllReferencingTables( )
+    
+    /**
+      *
+      * Fills the array $a_collected with the names of the tables referenced directly or indirectly  by the table object represented by $obj_referenced
+      *
+      * @param array $a_collected the array which should be filled with the names of the referenced tables as strings
+      * @param \rstoetter\cbalancedbinarytree\cBalancedBinaryTreeNode |null $obj_actual the object we are examining now
+      * @param \rstoetter\cbalancedbinarytree\cBalancedBinaryTreeNode  $obj_referenced the table object the tables in $a_collected are referring to
+      *
+      */       
+    
+    
+    protected function _CollectAllReferencedTables( 
+                                        array & $a_collected, 
+                                        $obj_actual, 
+                                        \rstoetter\cbalancedbinarytree\cBalancedBinaryTreeNode  $obj_referenced 
+                                        ) {
+        if ( is_null( $obj_actual ) ) {
+            return;
+        }
+        
+        foreach( $obj_actual->GetData( )->m_a_referenced_table_objects as $obj_referred ) {
+        
+            $table_name = $obj_referred->GetData( )->m_table_name;
+            if ( ! in_array( $table_name, $a_collected ) ) {
+                $a_collected[] = $table_name;
+            }
+            
+            if ( $table_name == $obj_actual->GetData( )->m_table_name ) {   // self-referencing table
+                continue;
+            }
+            
+            $this->_CollectAllReferencedTables( $a_collected, $obj_referred, $obj_referenced );
+            
+        }
+                                        
+    
+    }   // function _CollectAllReferencedTables( )
+    
+    
+    /**
+      *
+      * Fills the array $ary with the names of the tables the table $table_name is directly or indirectly  referring to
+      *
+      * @param array $ary the array which should be filled with the the names of the referenced tables as strings
+      * @param string $table_name the name of the table to examine
+      * @param bool $recursive defaults to true. If false, then merely tables directly referenced by $this->m_table_name are collected
+      *
+      */       
+    
+    
+    public function CollectAllReferencedTables( array & $ary, string $table_name, bool $recursive = true ) {
+    
+            $ary = array( );
+            
+            $obj_found = $this->SearchByKey( $table_name );
+            
+            if ( $obj_found !== false ) {
+            
+                if ( ! $recursive ) {
+                
+                    $obj_found->GetData( )->CollectAllDirectlyReferencedTables( $ary );
+                
+                } else {
+                
+                    $this->_CollectAllReferencedTables( $ary, $obj_found, $obj_found );
+                
+                }        
+
+            }
+
+    
+    }   // function CollectAllReferencedTables( )
+    
 
 
 }   // class cKeyColumnUsageTree
