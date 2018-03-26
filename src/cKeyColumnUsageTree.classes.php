@@ -473,7 +473,7 @@ class cKeyColumnUsageTreeNode extends \rstoetter\cbalancedbinarytree\cBalancedBi
   *
   * ## description
   *
-  * The class cKeyColumnUsageTree is the main class of the repository \rstoetter\ckeycolumnusagetree.
+  * The class cKeyColumnUsageTree is the main class of the repository rstoetter/ckeycolumnusagetree-php.
   *
   * The class represents a sorted collection of the key column usage of a mysql database. The main purpose of the class
   * cKeyColumnUsageTree is to determine the dependencies of the tables among each other: The class cKeyColumnUsageTree is able
