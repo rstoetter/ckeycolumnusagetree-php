@@ -15,9 +15,9 @@ Only mysql databases are supported at the moment
 
 There are some helper classes, which are significantly involved in adding functionality to the class cKeyColumnUsageTree:
 
-### The class cKeyColumnUsageTreeNode represents a single node in trees of the type \\rstoetter\\ckeycolumnusagetree\\cKeyColumnUsageTree. The class manages the data part, which can be retrieved by using the method GetData( )
+* The class cKeyColumnUsageTreeNode represents a single node in trees of the type \\rstoetter\\ckeycolumnusagetree\\cKeyColumnUsageTree. The class manages the data part, which can be retrieved by using the method GetData( )
 
-### The class cKeyColumnUsageTreeNodeData implements the data part of the nodes in trees of the type \\rstoetter\\ckeycolumnusagetree\\cKeyColumnUsageTree
+* The class cKeyColumnUsageTreeNodeData implements the data part of the nodes in trees of the type \\rstoetter\\ckeycolumnusagetree\\cKeyColumnUsageTree
 
 You will need PHP 7 or later to use this repository
 
